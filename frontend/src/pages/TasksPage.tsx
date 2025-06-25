@@ -15,19 +15,34 @@ import {
   Chip,
   Tabs,
   Tab,
-  Collapse,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useContext, useEffect, useRef, Fragment } from "react";
+import {
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  Fragment,
+} from "react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api/axios";
 import { blue, grey } from "@mui/material/colors";
 
-type Task = { id: number; title: string; description?: string; is_done: boolean };
+type Task = {
+  id: number;
+  title: string;
+  description?: string;
+  is_done: boolean;
+  created_at: string;
+};
 
 export default function TasksPage() {
   const qc = useQueryClient();
@@ -42,19 +57,20 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "done">(
     "all"
   );
+  const [sort, setSort] = useState<"created" | "status">("created");
 
   const editTitleRef = useRef<HTMLInputElement>(null);
 
-  /* -------------------- get tasks -------------------- */
+  /* -------------------- queries -------------------- */
   const { data: tasks = [] } = useQuery<Task[]>({
-    queryKey: ["tasks", statusFilter],
+    queryKey: ["tasks", statusFilter, sort],
     queryFn: () =>
       api
         .get("/tasks", {
-          params:
-            statusFilter === "all"
-              ? {}
-              : { status: statusFilter === "done" },
+          params: {
+            ...(statusFilter === "all" ? {} : { status: statusFilter === "done" }),
+            sort,
+          },
         })
         .then((r) => r.data),
   });
@@ -86,12 +102,12 @@ export default function TasksPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
-  /* focus title when начинаем редактировать */
+  /* focus при старте редактирования */
   useEffect(() => {
     if (editingId !== null) editTitleRef.current?.focus();
   }, [editingId]);
 
-  /* подтянуть e-mail, если страница обновлена */
+  /* подтягиваем e-mail при F5 */
   useEffect(() => {
     if (!email) {
       api
@@ -117,7 +133,8 @@ export default function TasksPage() {
         title: editingTitle,
         description: editingDesc,
         is_done: false,
-      } as Task);
+        created_at: "", // не используется
+      });
     setEditingId(null);
   };
 
@@ -132,18 +149,33 @@ export default function TasksPage() {
         </Button>
       </Box>
 
-      {/* фильтр */}
-      <Tabs
-        value={statusFilter}
-        onChange={(_, v) => setStatusFilter(v)}
-        textColor="primary"
-        indicatorColor="primary"
-        sx={{ mb: 2 }}
-      >
-        <Tab value="all" label="Все" />
-        <Tab value="active" label="Активные" />
-        <Tab value="done" label="Выполненные" />
-      </Tabs>
+      {/* фильтр + сортировка */}
+      <Box display="flex" alignItems="center" gap={2} mb={2}>
+        <Tabs
+          value={statusFilter}
+          onChange={(_, v) => setStatusFilter(v)}
+          textColor="primary"
+          indicatorColor="primary"
+          sx={{ flexGrow: 1 }}
+        >
+          <Tab value="all" label="Все" />
+          <Tab value="active" label="Активные" />
+          <Tab value="done" label="Выполненные" />
+        </Tabs>
+
+        <FormControl size="small" sx={{ minWidth: 140 }}>
+          <InputLabel id="sort-label">Сортировка</InputLabel>
+          <Select
+            labelId="sort-label"
+            label="Сортировка"
+            value={sort}
+            onChange={(e) => setSort(e.target.value as "created" | "status")}
+          >
+            <MenuItem value="created">По дате</MenuItem>
+            <MenuItem value="status">По статусу</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       {/* форма добавления */}
       <Box display="flex" flexDirection="column" gap={1} mb={2}>
@@ -171,7 +203,7 @@ export default function TasksPage() {
         </Button>
       </Box>
 
-      {/* список */}
+      {/* список задач */}
       <List>
         <AnimatePresence>
           {tasks.map((t) => (
