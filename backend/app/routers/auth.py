@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 from ..models import User
 from ..schemas import UserCreate, UserRead, Token
 from ..core.security import verify_password, hash_password, create_access_token
-from ..deps import get_db
+from ..deps import get_db, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -26,3 +26,7 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     token = create_access_token(user.email)
     return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/me", response_model=UserRead)
+def read_me(current_user: User = Depends(get_current_user)):
+    return current_user
