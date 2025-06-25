@@ -13,38 +13,59 @@ import {
   ListItem,
   ListItemText,
   Chip,
+  Tabs,
+  Tab,
+  Collapse,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/CheckCircle";
+import CloseIcon from "@mui/icons-material/Close";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef, Fragment } from "react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../api/axios";
 import { blue, grey } from "@mui/material/colors";
 
-type Task = { id: number; title: string; is_done: boolean };
+type Task = { id: number; title: string; description?: string; is_done: boolean };
 
 export default function TasksPage() {
   const qc = useQueryClient();
-  const { logout, email } = useContext(AuthContext);
-  if (!email) {
-    console.log("NO EMAIL")
-  }
-  const [title, setTitle] = useState("");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const editInput = useRef<HTMLInputElement>(null);
+  const { logout, email, login } = useContext(AuthContext);
 
+  /* -------------------- local state -------------------- */
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+  const [editingDesc, setEditingDesc] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "done">(
+    "all"
+  );
+
+  const editTitleRef = useRef<HTMLInputElement>(null);
+
+  /* -------------------- get tasks -------------------- */
   const { data: tasks = [] } = useQuery<Task[]>({
-    queryKey: ["tasks"],
-    queryFn: () => api.get("/tasks").then((r) => r.data),
+    queryKey: ["tasks", statusFilter],
+    queryFn: () =>
+      api
+        .get("/tasks", {
+          params:
+            statusFilter === "all"
+              ? {}
+              : { status: statusFilter === "done" },
+        })
+        .then((r) => r.data),
   });
 
+  /* -------------------- mutations -------------------- */
   const create = useMutation({
-    mutationFn: () => api.post("/tasks", { title }),
+    mutationFn: () => api.post("/tasks", { title, description: desc }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["tasks"] });
       setTitle("");
+      setDesc("");
     },
   });
 
@@ -59,50 +80,98 @@ export default function TasksPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
-  const rename = useMutation({
-    mutationFn: ({ id, title }: { id: number; title: string }) =>
-      api.put(`/tasks/${id}`, { title }),
+  const update = useMutation({
+    mutationFn: ({ id, title, description }: Task) =>
+      api.put(`/tasks/${id}`, { title, description }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
+  /* focus title when начинаем редактировать */
   useEffect(() => {
-    if (editingId !== null) editInput.current?.focus();
+    if (editingId !== null) editTitleRef.current?.focus();
   }, [editingId]);
 
+  /* подтянуть e-mail, если страница обновлена */
+  useEffect(() => {
+    if (!email) {
+      api
+        .get("/auth/me")
+        .then((r) =>
+          login(localStorage.getItem("token") ?? "", r.data.email as string)
+        )
+        .catch(() => logout());
+    }
+  }, [email, login, logout]);
+
+  /* -------------------- helpers -------------------- */
+  const startEdit = (t: Task) => {
+    setEditingId(t.id);
+    setEditingTitle(t.title);
+    setEditingDesc(t.description ?? "");
+  };
+
+  const saveEdit = () => {
+    if (editingId !== null)
+      update.mutate({
+        id: editingId,
+        title: editingTitle,
+        description: editingDesc,
+        is_done: false,
+      } as Task);
+    setEditingId(null);
+  };
+
+  /* -------------------- UI -------------------- */
   return (
-    <Box maxWidth={520} mx="auto" mt={5}>
-      {/* ───── шапка ───── */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
+    <Box maxWidth={560} mx="auto" mt={5}>
+      {/* шапка */}
+      <Box display="flex" justifyContent="space-between" mb={3}>
         <Box fontWeight={600}>{email}</Box>
         <Button onClick={logout} size="small" variant="outlined">
           Выйти
         </Button>
       </Box>
 
-      {/* ───── форма добавления ───── */}
-      <Box display="flex" gap={1} mb={2}>
+      {/* фильтр */}
+      <Tabs
+        value={statusFilter}
+        onChange={(_, v) => setStatusFilter(v)}
+        textColor="primary"
+        indicatorColor="primary"
+        sx={{ mb: 2 }}
+      >
+        <Tab value="all" label="Все" />
+        <Tab value="active" label="Активные" />
+        <Tab value="done" label="Выполненные" />
+      </Tabs>
+
+      {/* форма добавления */}
+      <Box display="flex" flexDirection="column" gap={1} mb={2}>
         <TextField
-          fullWidth
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          label="Новая задача"
+          label="Заголовок"
           size="small"
+        />
+        <TextField
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+          label="Описание"
+          size="small"
+          multiline
+          minRows={2}
         />
         <Button
           variant="contained"
           onClick={() => create.mutate()}
           disabled={!title.trim()}
+          sx={{ alignSelf: "flex-end", mt: 1 }}
         >
           +
         </Button>
       </Box>
 
-      {/* ───── список задач ───── */}
+      {/* список */}
       <List>
         <AnimatePresence>
           {tasks.map((t) => (
@@ -117,16 +186,23 @@ export default function TasksPage() {
                   bgcolor: t.is_done ? grey[100] : "background.paper",
                   borderRadius: 1,
                   mb: 1,
+                  alignItems: "flex-start",
                 }}
                 secondaryAction={
-                  <>
-                    <IconButton onClick={() => setEditingId(t.id)}>
-                      <EditIcon fontSize="small" />
+                  editingId === t.id ? (
+                    <IconButton onClick={() => setEditingId(null)}>
+                      <CloseIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={() => remove.mutate(t.id)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </>
+                  ) : (
+                    <Fragment>
+                      <IconButton onClick={() => startEdit(t)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton onClick={() => remove.mutate(t.id)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Fragment>
+                  )
                 }
               >
                 <Checkbox
@@ -135,29 +211,39 @@ export default function TasksPage() {
                   icon={<Chip label="todo" size="small" />}
                   checkedIcon={<DoneIcon sx={{ color: blue[600] }} />}
                   onChange={() => toggle.mutate(t)}
+                  sx={{ mt: 0.5 }}
                 />
 
                 {editingId === t.id ? (
-                  <TextField
-                    inputRef={editInput}
-                    defaultValue={t.title}
-                    size="small"
-                    variant="standard"
-                    onBlur={(e) => {
-                      rename.mutate({ id: t.id, title: e.target.value });
-                      setEditingId(null);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter")
-                        (e.target as HTMLInputElement).blur();
-                    }}
-                    sx={{ flex: 1 }}
-                  />
+                  <Box sx={{ flex: 1 }}>
+                    <TextField
+                      inputRef={editTitleRef}
+                      fullWidth
+                      variant="standard"
+                      size="small"
+                      value={editingTitle}
+                      onChange={(e) => setEditingTitle(e.target.value)}
+                    />
+                    <TextField
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      variant="standard"
+                      size="small"
+                      sx={{ mt: 0.5 }}
+                      value={editingDesc}
+                      onChange={(e) => setEditingDesc(e.target.value)}
+                      onBlur={saveEdit}
+                      onKeyDown={(e) => e.key === "Enter" && saveEdit()}
+                    />
+                  </Box>
                 ) : (
                   <ListItemText
                     primary={t.title}
+                    secondary={t.description}
                     sx={{
                       textDecoration: t.is_done ? "line-through" : "none",
+                      mt: 0.5,
                     }}
                   />
                 )}
