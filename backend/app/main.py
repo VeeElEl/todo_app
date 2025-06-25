@@ -1,10 +1,25 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 
 from .core.database import engine
 from .routers import auth, tasks
 
 app = FastAPI(title="Todo API")
+
+# --- CORS -----------------------------------------------------------------
+origins = [
+    "http://localhost:5173",   # TODO: потом сделать лучше
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+# --------------------------------------------------------------------------
+
 
 # создаём таблицы при первом старте
 @app.on_event("startup")
