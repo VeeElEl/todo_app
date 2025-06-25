@@ -2,7 +2,8 @@ import { createContext, useState, type ReactNode } from "react";
 
 interface AuthCtx {
   token: string | null;
-  login: (t: string) => void;
+  email: string | null;
+  login: (token: string, email: string) => void;
   logout: () => void;
 }
 
@@ -11,19 +12,24 @@ export const AuthContext = createContext<AuthCtx>({} as AuthCtx);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [email, setEmail] = useState<string | null>(localStorage.getItem("email"));
 
-  const login = (t: string) => {
-    localStorage.setItem("token", t);
-    setToken(t);
+  const login = (tok: string, em: string) => {
+    localStorage.setItem("token", tok);
+    localStorage.setItem("email", em);
+    setToken(tok);
+    setEmail(em);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("email");
     setToken(null);
+    setEmail(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, email, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

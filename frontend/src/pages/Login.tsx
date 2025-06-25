@@ -9,41 +9,48 @@ import { AuthContext } from "../context/AuthContext";
 
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export default function Login() {
   const { register, handleSubmit, formState } = useForm<FormData>({
-    resolver: zodResolver(schema)
+    resolver: zodResolver(schema),
   });
-  const { login: saveToken } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const onSubmit = async (data: FormData) => {
     try {
-      const res = await api.post("/auth/login", new URLSearchParams({
-        username: data.email,
-        password: data.password
-      }));
-      saveToken(res.data.access_token);
+      const res = await api.post(
+        "/auth/login",
+        new URLSearchParams({
+          username: data.email,
+          password: data.password,
+        })
+      );
+      login(res.data.access_token, data.email);
       navigate("/tasks");
-    } catch (e) {
-        console.log(e);
+    } catch {
       alert("Неверный e-mail или пароль");
     }
   };
 
   return (
     <Box maxWidth={360} mx="auto" mt={8}>
-      <Typography variant="h5" mb={2}>Вход</Typography>
+      <Typography variant="h5" mb={2}>
+        Вход
+      </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField fullWidth label="Email" {...register("email")} />
 
         <TextField
-          fullWidth type="password" label="Пароль" sx={{ mt: 2 }}
+          fullWidth
+          type="password"
+          label="Пароль"
+          sx={{ mt: 2 }}
           {...register("password")}
           error={!!formState.errors.password}
           helperText={formState.errors.password && "Минимум 8 символов"}
