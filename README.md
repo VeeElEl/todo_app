@@ -1,36 +1,58 @@
 # 🗒️ Todo App — FastAPI × React
 
-Учебное тестовое задание: «Список задач» с регистрацией, JWT-аутентификацией и CRUD-операциями.
+Тестовое задание: «Список задач» с регистрацией, JWT-аутентификацией и CRUD-операциями.
 
 ## ⚙️ Стек
 
-| Уровень   | Технологии |
-|-----------|------------|
-| Backend   | **FastAPI** · SQLModel · SQLite (по-умолчанию) · Pydantic · PyJWT |
-| Frontend  | **React 18** · Vite · TypeScript · React Router v6 · @tanstack/react-query · MUI v5 · Framer Motion |
+| Уровень  | Технологии                                                                                          |
+| -------- | --------------------------------------------------------------------------------------------------- |
+| Backend  | **FastAPI** · SQLModel · SQLite (по-умолчанию) · Pydantic · PyJWT                                   |
+| Frontend | **React 18** · Vite · TypeScript · React Router v6 · @tanstack/react-query · MUI v5 · Framer Motion |
+
 ---
 
 ## 🚀 Быстрый старт (Windows 10+)
 
-> ⚠ Python ≥ 3.10 и Node ≥ 18 должны быть в PATH.
+> ⚠ Для работы необходимы:
+> Python ≥ 3.10 https://www.python.org/downloads/
+> Node ≥ 18 https://nodejs.org/en/download
+> И то и то должно быть прописано в переменных среды (PATH)
 
+1. Скачать или склонировать репозиторий и открыть в терминале папку todo_app
 ```powershell
-# 1. Клонируем
-git clone https://github.com/your-nick/todo_app.git
+git clone https://github.com/VeeElEl/todo_app.git
 cd todo_app
+```
 
-# 2. Backend ──────────────────────────────────────────────
+2. Настроить Бэкенд 
+Из корневой папки (todo_app) установить все зависимости
+```powershell
 python -m venv venv
 .\venv\Scripts\activate              # source venv/bin/activate  (Linux/Mac)
 pip install -r requirements.txt
+```
 
-# 3. Frontend ─────────────────────────────────────────────
+3. Настроить Фронтенд 
+Из папки todo_app/fronted установить все зависимости
+```powershell
 cd frontend
 npm install
 cd ..
+```
 
-# 4. Запуск (два терминала)
-# ─ backend
+4. Запустить Бэкенд 
+Из папки todo_app в терминале прописать:
+```PowerShell
 uvicorn backend.app.main:app --reload --port 8000
-# ─ frontend
-cd frontend && npm run dev
+```
+Для проверки запуска, в браузере можно перейти на https://127.0.0.1:8000/docs
+Если все ок, то должна открыться Swagger-документация.
+
+5. Запустить Фронт 
+Из папки todo_app/frontend в терминале запустить с помощью команду npm
+```PowerShell
+cd frontend 
+npm run dev
+```
+Для проверки запуска, в браузере можно перейти http://localhost:5173/
+Если все ок, то откроется страница входа.
