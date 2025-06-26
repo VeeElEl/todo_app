@@ -64,37 +64,34 @@ npm run dev
 	Управление задачами
 
 **Backend (API):**
-- Выбрать бэкенд фреймворк для API 
-		Выбран FastAPI	
+- Выбрать бэкенд фреймворк для API
+
+  Выбран FastAPI	
 - Реализовать REST API:
-	 https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
-	 http://localhost:8000/docs#/ 
 
+  https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
 
+  http://localhost:8000/docs#/
+  
+- Реализовать функцию регистрации:
+  
+  https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
 
-	
-	
-			
-		Свагер документация тут (tasks):
-			
-	Реализовать функцию регистрации:
-		Реализовано тут (register):
-			https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
-		Свагер тут (auth/register(POST)):	
-			http://127.0.0.1:8000/docs#/
-	Реализовать функцию аутентификации (JWT-токен): 
-		Аутентификация через JWT тут (login через create_access_token):
-			https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
-		Работа с JWT происходит тут:
-			https://github.com/VeeElEl/todo_app/blob/master/backend/app/core/security.py
-		Свагер тут(auth/login(POST))
-	CRUD-операции для задач:
-		Реализовано тут: 
-			https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
-		Свагер документация тут (tasks):
-			http://localhost:8000/docs#/ 
-	Задачи должны содержать заголовок, описание, статус (todo/done), дату создания:
-		Реализовано тут:
-			https://github.com/VeeElEl/todo_app/blob/master/backend/app/models.py
-	Должна проводиться валидация и обработка ошибок:
+- Реализовать функцию аутентификации (JWT-токен):
+  
+  https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
+
+  https://github.com/VeeElEl/todo_app/blob/master/backend/app/core/security.py
+
+- CRUD-операции для задач:
+
+  https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
+
+- Задачи должны содержать заголовок, описание, статус (todo/done), дату создания:
+
+  https://github.com/VeeElEl/todo_app/blob/master/backend/app/models.py
+
+- Должна проводиться валидация и обработка ошибок:
+  
+  всюду в коде
 		
