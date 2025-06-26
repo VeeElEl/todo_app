@@ -103,7 +103,7 @@ npm run dev
   Выбран React
 
 - Сделать форму регистрации:
-  
-  ![Демонстрация]([demo.gif](https://github.com/VeeElEl/todo_app/blob/master/demo/registration1.gif))
+  ![Демонстрация](demo/registration.gif)
+
 
   
