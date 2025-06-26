@@ -66,7 +66,8 @@ npm run dev
 **Backend (API):**
 - Выбрать бэкенд фреймворк для API
 
-  Выбран FastAPI	
+  Выбран FastAPI
+  
 - Реализовать REST API:
 
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
@@ -95,3 +96,14 @@ npm run dev
   
   всюду в коде
 		
+**Frontend:**
+
+- Реализовать на React или Vue:
+
+  Выбран React
+
+- Сделать форму регистрации:
+  
+  ![Демонстрация]([demo.gif](https://github.com/VeeElEl/todo_app/blob/master/demo/registration1.gif))
+
+  
