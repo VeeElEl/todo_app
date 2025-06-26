@@ -46,6 +46,15 @@ type Task = {
   created_at: string;
 };
 
+const fmtDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+});
+
 export default function TasksPage() {
   const qc = useQueryClient();
   const { logout, email, login } = useContext(AuthContext);
@@ -300,7 +309,12 @@ export default function TasksPage() {
                 ) : (
                   <ListItemText
                     primary={t.title}
-                    secondary={t.description}
+                    secondary={
+                        <>
+                        {t.description && <span>{t.description}<br/></span>}
+                        <span style={{ color: "grey" }}>🕑 {fmtDate(t.created_at)}</span>
+                        </>
+                    }
                     sx={{
                       textDecoration: t.is_done ? "line-through" : "none",
                       mt: 0.5,
