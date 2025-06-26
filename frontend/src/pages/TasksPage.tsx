@@ -19,6 +19,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -62,7 +64,7 @@ export default function TasksPage() {
   const editTitleRef = useRef<HTMLInputElement>(null);
 
   /* -------------------- queries -------------------- */
-  const { data: tasks = [] } = useQuery<Task[]>({
+  const { data: tasks = [], isFetching } = useQuery<Task[]>({
     queryKey: ["tasks", statusFilter, sort],
     queryFn: () =>
       api
@@ -101,6 +103,32 @@ export default function TasksPage() {
       api.put(`/tasks/${id}`, { title, description }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
   });
+
+  const isBusy =
+    create.isPending ||
+    toggle.isPending ||
+    remove.isPending ||
+    update.isPending ||
+    isFetching;
+
+  /* -------- задержка 300 мс, чтобы не мигало -------- */
+    const [delayedBusy, setDelayedBusy] = useState(false);
+
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+
+        if (isBusy) {
+            timer = setTimeout(() => setDelayedBusy(true), 300);
+        } else {
+            setDelayedBusy(false);
+        }
+
+        // ← здесь добавили фигурные скобки
+        return () => {
+            if (timer) clearTimeout(timer);
+        };
+    }, [isBusy]);
+
 
   /* focus при старте редактирования */
   useEffect(() => {
@@ -284,6 +312,11 @@ export default function TasksPage() {
           ))}
         </AnimatePresence>
       </List>
+      {/* --- loader --- */}
+      <Backdrop open={delayedBusy} sx={{ zIndex: 1200, color: "#fff" }}>
+        <CircularProgress />
+      </Backdrop>
     </Box>
+    
   );
 }
