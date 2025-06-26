@@ -63,14 +63,20 @@ npm run dev
 	Аутентификация
 	Управление задачами
 
-Backend (API):
-	Выбрать бэкенд фреймворк для API 
-		Выбран FastAPI
-	Реализовать REST API:
-		Реализовано тут: 
-			https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
+**Backend (API):**
+- Выбрать бэкенд фреймворк для API 
+		Выбран FastAPI	
+- Реализовать REST API:
+	 https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
+	 http://localhost:8000/docs#/ 
+
+
+
+	
+	
+			
 		Свагер документация тут (tasks):
-			http://localhost:8000/docs#/ 
+			
 	Реализовать функцию регистрации:
 		Реализовано тут (register):
 			https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
