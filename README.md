@@ -64,46 +64,62 @@ npm run dev
 	Управление задачами
 
 **Backend (API):**
-- Выбрать бэкенд фреймворк для API
+- Выбрать бэкенд фреймворк для API: ✔️
 
   Выбран FastAPI
   
-- Реализовать REST API:
+- Реализовать REST API: ✔️
 
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
 
   http://localhost:8000/docs#/
   
-- Реализовать функцию регистрации:
+- Реализовать функцию регистрации: ✔️
   
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
 
-- Реализовать функцию аутентификации (JWT-токен):
+- Реализовать функцию аутентификации (JWT-токен): ✔️
   
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/auth.py
 
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/core/security.py
 
-- CRUD-операции для задач:
+- CRUD-операции для задач: ✔️
 
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/routers/tasks.py
 
-- Задачи должны содержать заголовок, описание, статус (todo/done), дату создания:
+- Задачи должны содержать заголовок, описание, статус (todo/done), дату создания: ✔️
 
   https://github.com/VeeElEl/todo_app/blob/master/backend/app/models.py
 
-- Должна проводиться валидация и обработка ошибок:
+- Должна проводиться валидация и обработка ошибок: ✔️
   
   всюду в коде
 		
 **Frontend:**
 
-- Реализовать на React или Vue:
+- Реализовать на React или Vue: ✔️
 
   Выбран React
 
-- Сделать форму регистрации:
-  ![Демонстрация](demo/registration.gif)
+- Сделать форму регистрации: ✔️
+  ![Рег](https://github.com/VeeElEl/todo_app/blob/master/demo/Registration1.gif)
 
+- Сделать форму логина: ✔️
+  ![Рег](https://github.com/VeeElEl/todo_app/blob/master/demo/Login1.gif)
 
-  
+- Сделать функциональ добавление задач, их редактирование, удаление, фильтрация по статусу: ✔️
+ ![Таск](https://github.com/VeeElEl/todo_app/blob/master/demo/Tasks1.gif)
+
+- Сделать обработку ошибок от API и отображение сообщений для пользователя: ✔️
+
+  Повсеместно, например в форме логина (если не правильный логин или пароль)
+
+**Дополнительно**
+- Добавить возможность сортировки задач по дате создания и статусу: ✔️
+
+  См. демонстрацию
+
+- Реализовать анимацию для добавления и удаления задач: ✔️
+
+  см. демонстрацию
