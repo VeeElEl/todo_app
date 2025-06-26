@@ -15,9 +15,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Login() {
-  const { register, handleSubmit, formState } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm<FormData>({
+        resolver: zodResolver(schema),
+    });
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -44,7 +48,13 @@ export default function Login() {
       </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField fullWidth label="Email" {...register("email")} />
+        <TextField
+            fullWidth
+            label="Email"
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+        />
 
         <TextField
           fullWidth
@@ -52,16 +62,21 @@ export default function Login() {
           label="Пароль"
           sx={{ mt: 2 }}
           {...register("password")}
-          error={!!formState.errors.password}
-          helperText={formState.errors.password && "Минимум 8 символов"}
+          error={Boolean(errors.password)}
+          helperText={errors.password?.message}
         />
-
-        <Button fullWidth variant="contained" sx={{ mt: 3 }} type="submit">
+        
+        <Button fullWidth variant="contained" sx={{ mt: 3 }} type="submit" disabled={!isValid}>
           Войти
         </Button>
 
-        <Button fullWidth sx={{ mt: 1 }} onClick={() => navigate("/register")}>
-          Нет аккаунта? Регистрация
+        <Button
+            fullWidth
+            sx={{ mt: 1 }}
+            variant="text"
+            onClick={() => navigate("/register")}   // ← переход на страницу регистрации
+        >
+            Регистрация
         </Button>
       </form>
     </Box>
